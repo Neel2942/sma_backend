@@ -38,8 +38,6 @@ const typeDefs = `#graphql
     contactNumber: String
     emailAddress: String
     password: String
-    registeredAt: Date
-    lastLogin: Date
     introduction: String
     profile: String
   }
@@ -57,14 +55,17 @@ const resolvers = {
     Mutation: {
         insertUser: async(parent,args,context,info)=>{
             const user = args.userDetails;
-            const {registeredAt} = args.userDetails;
             const userInsertDb = new userModel({
-                ...args.userDetails,registeredAt: new Date(registeredAt)
+                ...args.userDetails
             })
+            if(userModel.findOne({emailAddress : user['emailAddress']})){
+                console.log("Only one account can be made using email address");
+            }else{
+                const userSaved = await userInsertDb.save();
+                console.log(user);
+                return user;
+            }
 
-            const userSaved = await userInsertDb.save();
-            console.log(user);
-            return user;
         }
     }
   };
