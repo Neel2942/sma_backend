@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
-import userModel from "./user";
 
 const userFriendSchema = new mongoose.Schema({
-    sourceId : userModel,
-    targetId : userModel,
+    sourceId : {type:mongoose.Schema.Types.ObjectId,ref:"userModel",default: new Date()},
+    targetId : {type:mongoose.Schema.Types.ObjectId,ref:"userModel",default: new Date()},
     type : String,
     status : String,
-    createdAt : Date,
-    updatedAt : Date,
+    createdAt : {type:Date,default:new Date()},
+    updatedAt : {type:Date,default:new Date()},
     notes : String
 });
 

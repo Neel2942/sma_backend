@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
-import userModel from "./user";
 
 const userFollowerSchema = new mongoose.Schema({
-    sourceId : userModel,
-    targetId : userModel,
+    sourceId : {type:mongoose.Schema.Types.ObjectId,ref:"userModel",default: new Date()},
+    targetId : {type:mongoose.Schema.Types.ObjectId,ref:"userModel",default: new Date()},
     type : String,
     createdAt : Date,
     updatedAt : Date,

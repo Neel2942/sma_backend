@@ -1,6 +1,11 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import bcrypt from "bcrypt";
 import userModel from "./models/user.js";
+import userFriendModel from "./models/userFriend.js";
+// import userFollowerModel from "./models/userFollower.js";
+// import userPostModel from "./models/userPost.js";
+// import userChatModel from "./models/userChat.js";
 import mongoose from "mongoose";
 
 // MongoDB Connection
@@ -37,8 +42,8 @@ const typeDefs = `#graphql
   }
 
   type userFriend{
-    sourceId: user
-    targetId: user
+    sourceId: ID
+    targetId: ID
     type: String
     status: String
     createdAt: Date
@@ -71,6 +76,7 @@ const typeDefs = `#graphql
   }
 
   type Query{
+    getUserByEmail(userEmail:String,userPassword:String): user
     getAllUser: [user]
   }
 
@@ -84,14 +90,42 @@ const typeDefs = `#graphql
     profile: String
   }
 
+  input userFriendData{
+    sourceId: ID
+    targetId: ID
+    type: String
+    status: String
+    createdAt: Date
+    updatedAt: Date
+    notes: String
+  }
+
   type Mutation{
     insertUser(userDetails:userData): user
+    insertUserFriend(userFriendDetails:userFriendData): userFriend
   }
 `;
 
 // Resolvers Function
 const resolvers = {
-  Query: {},
+  Query: {
+    getUserByEmail: async(parent,args,context,info)=>{
+      const email=args.userEmail;
+      const password = args.userPassword;
+      const data = await userModel.findOne({emailAddress:email});
+      if(data){
+        const passwordCheck = await bcrypt.compare(password,data['password']);
+
+        if(passwordCheck){
+          console.log("Authentic User Login");
+        }else{
+          console.log("Wrong Password");
+        }
+      }else{
+        console.log("No Email Found");
+      }
+    }
+  },
   Mutation: {
     insertUser: async (parent, args, context, info) => {
       const user = args.userDetails;
@@ -108,8 +142,26 @@ const resolvers = {
         console.log(user);
         return user;
       }
-    }
-  }
+    },
+    insertUserFriend: async (parent, args, context, info) => {
+      const userFriend = args.userFriendDetails;
+      const userFriendInsertDb = new userFriendModel({
+        ...args.userFriendDetails,
+      });
+      const data = await userModel.findById(userFriend["sourceId"]);
+      if (data) {
+        const data2 = await userModel.findById(userFriend["targetId"]);
+        if (data2) {
+          const userFriendSaved = await userFriendInsertDb.save();
+          console.log(userFriend);
+        }else{
+          console.log("No user2 found");
+        }
+      } else {
+        console.log("No user1 found");
+      }
+    },
+  },
 };
 
 // Apollo Server Instance

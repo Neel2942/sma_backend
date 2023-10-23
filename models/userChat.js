@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
-import userModel from "./user";
 
 const userChatSchema = new mongoose.Schema({
-    sourceId : userModel,
-    targetId : userModel,
+    sourceId : {type:mongoose.Schema.Types.ObjectId,ref:"userModel",default: new Date()},
+    targetId : {type:mongoose.Schema.Types.ObjectId,ref:"userModel",default: new Date()},
     message : String,
     createdAt : Date,
     updatedAt : Date,
