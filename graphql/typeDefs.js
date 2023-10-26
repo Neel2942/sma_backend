@@ -48,8 +48,12 @@ const typeDefs = `#graphql
     updatedAt: Date
   }
 
+  input loginCred{
+    emailAddress: String
+    password: String
+  }
   type Query{
-    getUserByEmail(userEmail:String,userPassword:String): user
+    getUserByEmail(userCred:loginCred): user
     getAllUser: [user]
   }
 

@@ -8,8 +8,8 @@ import userChatModel from "../models/userChat.js";
 const resolvers = {
     Query: {
       getUserByEmail: async(parent,args,context,info)=>{
-        const email=args.userEmail;
-        const password = args.userPassword;
+        const email=args.userCred['emailAddress'];
+        const password = args.userCred['password'];
         const data = await userModel.findOne({emailAddress:email});
         if(data){
           const passwordCheck = await bcrypt.compare(password,data['password']);
