@@ -12,6 +12,7 @@ const typeDefs = `#graphql
     lastLogin: Date
     introduction: String
     profile: String
+    token:String
   }
 
   type userFriend{
@@ -48,10 +49,6 @@ const typeDefs = `#graphql
     updatedAt: Date
   }
 
-  input loginCred{
-    emailAddress: String
-    password: String
-  }
   type Query{
     getUserByEmail(userCred:loginCred): user
     getAllUser: [user]
@@ -67,6 +64,11 @@ const typeDefs = `#graphql
     profile: String
   }
 
+  input loginCred{
+    emailAddress: String
+    password: String
+  }
+
   input userFriendData{
     sourceId: ID
     targetId: ID
@@ -79,6 +81,7 @@ const typeDefs = `#graphql
 
   type Mutation{
     insertUser(userDetails:userData): user
+    loginUserByEmail(userCred:loginCred): user 
     insertUserFriend(userFriendDetails:userFriendData): userFriend
   }
 `;

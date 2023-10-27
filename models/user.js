@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     registeredAt : {type:Date,default: new Date()},
     lastLogin : {type:Date,default: new Date()},
     introduction : {type:String},
-    profile : {type:String}
+    profile : {type:String},
+    token : {type:String}
 
 });
 

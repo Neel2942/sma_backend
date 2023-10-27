@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import userModel from "../models/user.js";
 import userFriendModel from "../models/userFriend.js";
 import userFollowerModel from "../models/userFollower.js";
@@ -7,26 +8,12 @@ import userChatModel from "../models/userChat.js";
 
 const resolvers = {
     Query: {
-      getUserByEmail: async(parent,args,context,info)=>{
-        const email=args.userCred['emailAddress'];
-        const password = args.userCred['password'];
-        const data = await userModel.findOne({emailAddress:email});
-        if(data){
-          const passwordCheck = await bcrypt.compare(password,data['password']);
-  
-          if(passwordCheck){
-            console.log("Authentic User Login");
-          }else{
-            console.log("Wrong Password");
-          }
-        }else{
-          console.log("No Email Found");
-        }
-      }
+      
     },
     Mutation: {
       insertUser: async (parent, args, context, info) => {
         const user = args.userDetails;
+        const email = user["emailAddress"];
         const userInsertDb = new userModel({
           ...args.userDetails,
         });
@@ -36,9 +23,37 @@ const resolvers = {
         if (data) {
           console.log("Only one account can be made using email address");
         } else {
+          const token = jwt.sign(
+            {userId: userInsertDb._id,email},"UNSAFE_STRING",
+            {
+              expiresIn:  "2h"
+            });
+            userInsertDb.token = token;        
           const userSaved = await userInsertDb.save();
           console.log(user);
           return user;
+        }
+      },
+      loginUserByEmail: async(parent,args,context,info)=>{
+        const email=args.userCred['emailAddress'];
+        const password = args.userCred['password'];
+        const data = await userModel.findOne({emailAddress:email});
+        if(data){
+          const passwordCheck = await bcrypt.compare(password,data['password']);
+          if(passwordCheck){
+            const token = jwt.sign(
+              {userId: data._id,email},"UNSAFE_STRING",
+              {
+                expiresIn:  "2h"
+              });
+              data.token = token;
+              console.log("Authentic User Login");
+              return data;
+          }else{
+            console.log("Wrong Password");
+          }
+        }else{
+          console.log("No Email Found");
         }
       },
       insertUserFriend: async (parent, args, context, info) => {
