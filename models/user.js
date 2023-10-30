@@ -22,7 +22,7 @@ userSchema.pre("save",function(next){
     bcrypt.hash(user.password,10,(err,hash)=>{
         user.password = hash;
         next();
-    })
+    });
 });
 
 const userModel = mongoose.model("user",userSchema);
