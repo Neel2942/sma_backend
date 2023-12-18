@@ -1,6 +1,7 @@
 const typeDefs = `#graphql
 
   scalar Date
+  scalar Upload
 
   type user {
     firstName: String
@@ -26,24 +27,23 @@ const typeDefs = `#graphql
   }
 
   type userFollower{
-    sourceId: user
-    targetId: user
+    sourceId: ID
+    targetId: ID
     type: String
     createdAt: Date
     updatedAt: Date
   }
 
   type userPost{
-    sourceId: user
-    targetId: user
-    type: String
+    sourceId: ID
+    post: String
     createdAt: Date
     updatedAt: Date
   }
 
   type userChat{
-    sourceId: user
-    targetId: user
+    sourceId: ID
+    targetId: ID
     type: String
     createdAt: Date
     updatedAt: Date
@@ -79,10 +79,23 @@ const typeDefs = `#graphql
     notes: String
   }
 
+  input userPostData{
+    sourceId: ID
+    post: String
+    createdAt: Date
+    updatedAt: Date
+  }
+
   type Mutation{
-    insertUser(userDetails:userData): user
     loginUserByEmail(userCred:loginCred): user 
+
+    insertUser(userDetails:userData): user
+
+    imageUpload(file: Upload!):String!
+
     insertUserFriend(userFriendDetails:userFriendData): userFriend
+
+    insertUserPost(userPostDetails:userPostData): userPost
   }
 `;
 
